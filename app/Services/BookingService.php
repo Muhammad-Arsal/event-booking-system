@@ -3,6 +3,15 @@
 namespace App\Services;
 
 use App\Interfaces\BookingRepositoryInterface;
+use App\Mail\BookingConfirmedMail;
+use App\Models\Booking;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class BookingService
 {
@@ -10,22 +19,82 @@ class BookingService
         protected BookingRepositoryInterface $bookingRepository
     ) {}
 
-    public function getUserBookings(int $userId, int $perPage = 10)
+    public function getUserBookings(int $userId, int $perPage = 10): LengthAwarePaginator
     {
         return $this->bookingRepository->paginateUserBookings($userId, $perPage);
     }
 
-    public function createBooking(array $data)
+    public function createBooking(int $userId, array $data): Booking
     {
-        // Seat availability checks, duplicate-booking guards, etc. will go here
-        return $this->bookingRepository->create($data);
+        $booking = DB::transaction(function () use ($userId, $data) {
+            $seatsBooked = (int) $data['seats_booked'];
+            $event = $this->bookingRepository->findEventForUpdate((int) $data['event_id']);
+
+            if ($seatsBooked < 1) {
+                throw ValidationException::withMessages([
+                    'seats_booked' => 'Please select at least one seat.',
+                ]);
+            }
+
+            if ($event->available_seats < $seatsBooked) {
+                throw ValidationException::withMessages([
+                    'seats_booked' => 'Only '.$event->available_seats.' seat(s) are currently available.',
+                ]);
+            }
+
+            $event->available_seats -= $seatsBooked;
+            $this->bookingRepository->saveEvent($event);
+
+            return $this->bookingRepository->create([
+                'user_id' => $userId,
+                'event_id' => $event->id,
+                'seats_booked' => $seatsBooked,
+                'status' => 'booked',
+                'booking_date' => now(),
+            ]);
+        });
+
+        $booking->load('event');
+
+        $user = User::query()->find($userId);
+
+        if ($user !== null) {
+            try {
+                Mail::to($user->email)->send(new BookingConfirmedMail($booking));
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        return $booking;
     }
 
-    public function cancelBooking(int $bookingId, int $userId)
+    public function cancelBooking(int $bookingId, int $userId): Booking
     {
-        $booking = $this->bookingRepository->findById($bookingId);
+        return DB::transaction(function () use ($bookingId, $userId) {
+            $booking = $this->bookingRepository->findByIdForUpdate($bookingId);
 
-        // Ownership verification and cancellation rules will go here
-        return $this->bookingRepository->update($bookingId, ['status' => 'cancelled']);
+            if ($booking->user_id !== $userId) {
+                throw new AuthorizationException('You are not allowed to cancel this booking.');
+            }
+
+            if ($booking->status === 'cancelled') {
+                throw ValidationException::withMessages([
+                    'booking' => 'This booking has already been cancelled.',
+                ]);
+            }
+
+            $event = $this->bookingRepository->findEventForUpdate($booking->event_id);
+            $event->available_seats = min(
+                $event->total_seats,
+                $event->available_seats + $booking->seats_booked
+            );
+
+            $this->bookingRepository->saveEvent($event);
+
+            return $this->bookingRepository->update($booking, [
+                'status' => 'cancelled',
+            ]);
+        });
     }
 }

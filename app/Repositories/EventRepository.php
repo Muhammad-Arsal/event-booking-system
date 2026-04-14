@@ -3,33 +3,48 @@
 namespace App\Repositories;
 
 use App\Interfaces\EventRepositoryInterface;
-use LogicException;
+use App\Models\Event;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EventRepository implements EventRepositoryInterface
 {
-    public function paginateUpcoming(int $perPage = 10)
+    public function paginateUpcoming(int $perPage = 10, array $filters = []): LengthAwarePaginator
     {
-        // Will query the Event model once it's created
-        throw new LogicException('EventRepository::paginateUpcoming() is not implemented yet.');
+        $query = Event::query();
+
+        if (! empty($filters['location'])) {
+            $query->where('location', 'like', '%'.$filters['location'].'%');
+        }
+
+        if (! empty($filters['date'])) {
+            $query->whereDate('event_datetime', $filters['date']);
+        }
+
+        return $query
+            ->orderBy('event_datetime')
+            ->paginate($perPage);
     }
 
-    public function findById(int $id)
+    public function findById(int $id): Event
     {
-        throw new LogicException('EventRepository::findById() is not implemented yet.');
+        return Event::query()
+            ->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Event
     {
-        throw new LogicException('EventRepository::create() is not implemented yet.');
+        return Event::query()->create($data);
     }
 
-    public function update(int $id, array $data)
+    public function update(Event $event, array $data): Event
     {
-        throw new LogicException('EventRepository::update() is not implemented yet.');
+        $event->update($data);
+
+        return $event->refresh();
     }
 
-    public function delete(int $id)
+    public function delete(Event $event): bool
     {
-        throw new LogicException('EventRepository::delete() is not implemented yet.');
+        return (bool) $event->delete();
     }
 }

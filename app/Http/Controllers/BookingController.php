@@ -2,24 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Booking\CancelBookingRequest;
+use App\Http\Requests\Booking\StoreBookingRequest;
+use App\Models\Booking;
+use App\Services\BookingService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class BookingController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected BookingService $bookingService
+    ) {}
+
+    public function index(): View
     {
-        return view('bookings.index');
+        $this->authorize('viewAny', Booking::class);
+
+        $bookings = $this->bookingService->getUserBookings((int) auth()->id(), 10);
+
+        return view('bookings.index', compact('bookings'));
     }
 
-    public function store(Request $request, string $event)
+    public function store(StoreBookingRequest $request): RedirectResponse
     {
-        // Placeholder: handle event booking logic here
-        return redirect()->route('bookings.index')->with('status', 'Event booked successfully (placeholder).');
+        $this->authorize('create', Booking::class);
+
+        $booking = $this->bookingService->createBooking(
+            (int) $request->user()->id,
+            $request->validated()
+        );
+
+        return redirect()
+            ->route('events.show', $booking->event_id)
+            ->with('status', 'Your booking has been confirmed.');
     }
 
-    public function cancel(string $booking)
+    public function cancel(CancelBookingRequest $request, Booking $booking): RedirectResponse
     {
-        // Placeholder: handle booking cancellation logic here
-        return redirect()->route('bookings.index')->with('status', 'Booking cancelled successfully (placeholder).');
+        $request->validated();
+        $this->authorize('cancel', $booking);
+
+        $this->bookingService->cancelBooking($booking->id, (int) $request->user()->id);
+
+        return redirect()
+            ->route('bookings.index')
+            ->with('status', 'Booking cancelled successfully.');
     }
 }

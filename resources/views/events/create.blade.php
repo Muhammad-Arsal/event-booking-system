@@ -1,56 +1,65 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             {{ __('Create Event') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    
-                    <div class="mb-8 border-l-4 border-indigo-400 bg-indigo-50 p-4 rounded-r-md">
-                        <p class="text-indigo-700 text-sm font-medium">
-                            The form structure is in place and ready for backend processing. It currently submits a placeholder payload.
-                        </p>
+    <div class="py-10">
+        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Event Information</h3>
+                    <p class="mt-1 text-sm text-gray-500">Fill out the key details and publish the event when you're ready.</p>
+                </div>
+
+                <form action="{{ route('events.store') }}" method="POST" class="space-y-6">
+                    @csrf
+
+                    <div>
+                        <x-input-label for="title" :value="__('Title')" />
+                        <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" :value="old('title')" required autofocus />
+                        <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
-                    <form action="{{ route('events.store') }}" method="POST" class="space-y-6">
-                        @csrf
-                        
+                    <div>
+                        <x-input-label for="description" :value="__('Description')" />
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="5"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        >{{ old('description') }}</textarea>
+                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                            <label for="title" class="block font-medium text-sm text-gray-700">Event Title</label>
-                            <input id="title" type="text" name="title" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" placeholder="e.g., Annual Tech Conference">
+                            <x-input-label for="location" :value="__('Location')" />
+                            <x-text-input id="location" name="location" type="text" class="mt-1 block w-full" :value="old('location')" required />
+                            <x-input-error :messages="$errors->get('location')" class="mt-2" />
                         </div>
 
                         <div>
-                            <label for="description" class="block font-medium text-sm text-gray-700">Description</label>
-                            <textarea id="description" name="description" rows="4" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" placeholder="Details about what the event covers..."></textarea>
+                            <x-input-label for="event_datetime" :value="__('Event Date & Time')" />
+                            <x-text-input id="event_datetime" name="event_datetime" type="datetime-local" class="mt-1 block w-full" :value="old('event_datetime')" required />
+                            <x-input-error :messages="$errors->get('event_datetime')" class="mt-2" />
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="date" class="block font-medium text-sm text-gray-700">Date</label>
-                                <input id="date" type="date" name="date" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
-                            </div>
-                            <div>
-                                <label for="capacity" class="block font-medium text-sm text-gray-700">Capacity</label>
-                                <input id="capacity" type="number" name="capacity" min="1" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" placeholder="e.g., 100">
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-100">
-                            <a href="{{ route('events.index') }}" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-4">
-                                Cancel
-                            </a>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                Save Event
-                            </button>
-                        </div>
-                    </form>
+                    <div class="sm:w-1/2">
+                        <x-input-label for="total_seats" :value="__('Total Seats')" />
+                        <x-text-input id="total_seats" name="total_seats" type="number" min="1" class="mt-1 block w-full" :value="old('total_seats')" required />
+                        <x-input-error :messages="$errors->get('total_seats')" class="mt-2" />
+                    </div>
 
-                </div>
+                    <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
+                        <a href="{{ route('events.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Cancel</a>
+                        <x-primary-button>
+                            {{ __('Save Event') }}
+                        </x-primary-button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

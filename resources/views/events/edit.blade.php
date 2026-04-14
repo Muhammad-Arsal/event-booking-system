@@ -1,62 +1,95 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">
             {{ __('Edit Event') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    
-                    <div class="mb-8 border-l-4 border-amber-400 bg-amber-50 p-4 rounded-r-md">
-                        <p class="text-amber-700 text-sm font-medium">
-                            This edit screen is awaiting real data binding. For now, it represents the interface we will use to update event information.
-                        </p>
-                        <p class="text-amber-600 text-xs mt-1">Editing Event ID: {{ $event }}</p>
+    <div class="py-10">
+        <div class="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+                <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Update Event</h3>
+                        <p class="mt-1 text-sm text-gray-500">Edit the details below. Seat availability is adjusted automatically.</p>
                     </div>
 
-                    <form action="{{ route('events.update', $event) }}" method="POST" class="space-y-6">
-                        @csrf
-                        @method('PUT')
-                        
-                        <div>
-                            <label for="title" class="block font-medium text-sm text-gray-700">Event Title</label>
-                            <input id="title" type="text" name="title" value="Sample Title Placeholder" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">
-                        </div>
-
-                        <div>
-                            <label for="description" class="block font-medium text-sm text-gray-700">Description</label>
-                            <textarea id="description" name="description" rows="4" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full">This is a placeholder description that would normally be populated with the event's existing details from the database.</textarea>
-                        </div>
-
-                        <div class="flex items-center justify-between mt-8 pt-4 border-t border-gray-100">
-                            <div>
-                                <!-- Delete Button visually separated -->
-                                <button type="button" onclick="document.getElementById('delete-event-form').submit();" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    Delete
-                                </button>
-                            </div>
-                            <div class="flex items-center">
-                                <a href="{{ route('events.show', $event) }}" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-4">
-                                    Cancel
-                                </a>
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    Update Event
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <!-- Hidden Delete Form -->
-                    <form id="delete-event-form" action="{{ route('events.destroy', $event) }}" method="POST" class="hidden">
-                        @csrf
-                        @method('DELETE')
-                    </form>
-
+                    <p class="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                        Available Seats: <span class="font-semibold text-gray-900">{{ $event->available_seats }}</span>
+                    </p>
                 </div>
+
+                <form action="{{ route('events.update', $event->id) }}" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <x-input-label for="title" :value="__('Title')" />
+                        <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" :value="old('title', $event->title)" required autofocus />
+                        <x-input-error :messages="$errors->get('title')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="description" :value="__('Description')" />
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="5"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        >{{ old('description', $event->description) }}</textarea>
+                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <x-input-label for="location" :value="__('Location')" />
+                            <x-text-input id="location" name="location" type="text" class="mt-1 block w-full" :value="old('location', $event->location)" required />
+                            <x-input-error :messages="$errors->get('location')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="event_datetime" :value="__('Event Date & Time')" />
+                            <x-text-input id="event_datetime" name="event_datetime" type="datetime-local" class="mt-1 block w-full" :value="old('event_datetime', $event->event_datetime->format('Y-m-d\TH:i'))" required />
+                            <x-input-error :messages="$errors->get('event_datetime')" class="mt-2" />
+                        </div>
+                    </div>
+
+                    <div class="sm:w-1/2">
+                        <x-input-label for="total_seats" :value="__('Total Seats')" />
+                        <x-text-input id="total_seats" name="total_seats" type="number" min="1" class="mt-1 block w-full" :value="old('total_seats', $event->total_seats)" required />
+                        <x-input-error :messages="$errors->get('total_seats')" class="mt-2" />
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-200 pt-6">
+                        <button
+                            type="submit"
+                            form="delete-event-form"
+                            class="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-red-700 transition hover:bg-red-100"
+                            onclick="return confirm('Delete this event?');"
+                        >
+                            Delete Event
+                        </button>
+
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('events.show', $event->id) }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Cancel</a>
+                            <x-primary-button>
+                                {{ __('Update Event') }}
+                            </x-primary-button>
+                        </div>
+                    </div>
+                </form>
             </div>
+
+            <form id="delete-event-form" action="{{ route('events.destroy', $event->id) }}" method="POST" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
     </div>
 </x-app-layout>
