@@ -38,7 +38,7 @@ Think of it like this:
 ### 1. Clone and open the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Muhammad-Arsal/event-booking-system.git
 cd event-booking-system
 ```
 
@@ -174,4 +174,3 @@ npm run dev
 - Creating, updating, and deleting events is admin-only.
 - Booking and cancellation require authenticated + verified users.
 - Users can only cancel their own bookings.
-
