@@ -10,7 +10,7 @@
             <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-8">
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Event Information</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Fill out the key details and publish the event when you're ready.</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Fill out the key details</p>
                 </div>
 
                 <form action="{{ route('events.store') }}" method="POST" class="space-y-6">

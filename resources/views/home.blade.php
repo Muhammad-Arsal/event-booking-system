@@ -5,7 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="Event Booking System — Laravel Developer Assessment">
 
-        <title>Event Booking System</title>
+        @php
+            $appName = config('app.name', 'Event Booking System');
+            if ($appName === 'Laravel') {
+                $appName = 'Event Booking System';
+            }
+        @endphp
+        <title>Home | {{ $appName }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

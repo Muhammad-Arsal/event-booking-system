@@ -5,7 +5,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $appName = config('app.name', 'Event Booking System');
+            if ($appName === 'Laravel') {
+                $appName = 'Event Booking System';
+            }
+
+            $routeName = request()->route()?->getName();
+            $pageTitle = match ($routeName) {
+                'dashboard' => 'Dashboard',
+                'events.index' => 'Events',
+                'events.show' => 'Event Details',
+                'events.create' => 'Create Event',
+                'events.edit' => 'Edit Event',
+                'bookings.index' => 'My Bookings',
+                'profile.edit' => 'Profile',
+                default => 'Event Booking System',
+            };
+        @endphp
+
+        <title>{{ $pageTitle }} | {{ $appName }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
