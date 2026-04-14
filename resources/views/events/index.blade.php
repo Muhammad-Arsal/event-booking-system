@@ -8,14 +8,14 @@
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Browse upcoming events</p>
             </div>
 
-            @auth
+            @can('create', \App\Models\Event::class)
                 <a
                     href="{{ route('events.create') }}"
                     class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white dark:focus:ring-offset-gray-800"
                 >
                     Create Event
                 </a>
-            @endauth
+            @endcan
         </div>
     </x-slot>
 
@@ -113,23 +113,34 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm">
-                                        <a
-                                            href="{{ route('events.show', $event->id) }}"
-                                            class="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
-                                        >
-                                            View Details
-                                        </a>
+                                        <div class="inline-flex items-center gap-2">
+                                            @can('update', $event)
+                                                <a
+                                                    href="{{ route('events.edit', $event->id) }}"
+                                                    class="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                                                >
+                                                    Edit
+                                                </a>
+                                            @endcan
+
+                                            <a
+                                                href="{{ route('events.show', $event->id) }}"
+                                                class="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                                            >
+                                                View Details
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="5" class="px-6 py-14 text-center">
                                         <p class="text-sm font-medium text-gray-700 dark:text-gray-200">No events published yet.</p>
-                                        @auth
+                                        @can('create', \App\Models\Event::class)
                                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create the first event to get started.</p>
                                         @else
                                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Please check back soon.</p>
-                                        @endauth
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforelse

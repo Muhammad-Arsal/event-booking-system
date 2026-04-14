@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Interfaces\EventRepositoryInterface;
 use App\Models\Event;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EventService
@@ -44,15 +43,5 @@ class EventService
     public function deleteEvent(Event $event): bool
     {
         return $this->eventRepository->delete($event);
-    }
-
-    /**
-     * We can swap this for policies later without changing controller flow.
-     */
-    public function ensureUserCanManage(Event $event, int $userId): void
-    {
-        if ($event->created_by !== $userId) {
-            throw new AuthorizationException('You are not allowed to manage this event.');
-        }
     }
 }

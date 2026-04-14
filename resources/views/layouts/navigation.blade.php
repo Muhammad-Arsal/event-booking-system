@@ -62,10 +62,10 @@
                     </x-dropdown>
                 @else
                     <div class="flex items-center gap-4">
-                        <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Log in</a>
+                        <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">Log in</a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Register</a>
+                            <a href="{{ route('register') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">Register</a>
                         @endif
                     </div>
                 @endauth

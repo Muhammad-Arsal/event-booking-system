@@ -41,9 +41,8 @@ class BookingController extends Controller
     public function cancel(CancelBookingRequest $request, Booking $booking): RedirectResponse
     {
         $request->validated();
-        $this->authorize('cancel', $booking);
 
-        $this->bookingService->cancelBooking($booking->id, (int) $request->user()->id);
+        $this->bookingService->cancelBooking($booking->id);
 
         return redirect()
             ->route('bookings.index')

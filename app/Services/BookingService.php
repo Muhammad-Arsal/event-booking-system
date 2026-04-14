@@ -6,7 +6,6 @@ use App\Interfaces\BookingRepositoryInterface;
 use App\Mail\BookingConfirmedMail;
 use App\Models\Booking;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -69,14 +68,10 @@ class BookingService
         return $booking;
     }
 
-    public function cancelBooking(int $bookingId, int $userId): Booking
+    public function cancelBooking(int $bookingId): Booking
     {
-        return DB::transaction(function () use ($bookingId, $userId) {
+        return DB::transaction(function () use ($bookingId) {
             $booking = $this->bookingRepository->findByIdForUpdate($bookingId);
-
-            if ($booking->user_id !== $userId) {
-                throw new AuthorizationException('You are not allowed to cancel this booking.');
-            }
 
             if ($booking->status === 'cancelled') {
                 throw ValidationException::withMessages([

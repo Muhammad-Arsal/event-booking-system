@@ -16,6 +16,7 @@ class EventBookingDemoSeeder extends Seeder
         $adminUser = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
+            'role' => 'admin',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
@@ -27,18 +28,6 @@ class EventBookingDemoSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        $organizerA = User::factory()->create([
-            'name' => 'Sadia Khan',
-            'email' => 'sadia@example.com',
-            'password' => Hash::make('password123'),
-        ]);
-
-        $organizerB = User::factory()->create([
-            'name' => 'Usman Ali',
-            'email' => 'usman@example.com',
-            'password' => Hash::make('password123'),
-        ]);
-
         $guestUser = User::factory()->create([
             'name' => 'Ayesha Malik',
             'email' => 'ayesha@example.com',
@@ -46,18 +35,18 @@ class EventBookingDemoSeeder extends Seeder
         ]);
 
         $events = collect([
-            $this->createEvent($organizerA->id, 'Laravel Community Summit', 'Karachi', now()->addDays(14)->setTime(18, 30), 120, 'A community-led evening on Laravel architecture, tooling, and practical scaling lessons.'),
-            $this->createEvent($organizerB->id, 'Product Design Meetup', 'Lahore', now()->addDays(9)->setTime(19, 0), 60, 'A practical meetup focused on product discovery, user journeys, and design reviews.'),
-            $this->createEvent($organizerA->id, 'Startup Pitch Night', 'Islamabad', now()->addDays(21)->setTime(17, 45), 80, 'Founders pitch their products to local mentors and early-stage operators.'),
-            $this->createEvent($organizerA->id, 'Data Engineering Bootcamp', 'Karachi', now()->addDays(35)->setTime(10, 0), 45, 'Hands-on sessions around pipelines, warehousing, and reliable data workflows.'),
-            $this->createEvent($organizerB->id, 'Women in Tech Circle', 'Lahore', now()->addDays(18)->setTime(16, 30), 50, 'Networking and speaker sessions with a focus on mentorship and career growth.'),
-            $this->createEvent($organizerA->id, 'Freelancers Networking Evening', 'Karachi', now()->addDays(5)->setTime(20, 0), 70, 'An informal networking event for freelance developers, designers, and marketers.'),
-            $this->createEvent($organizerB->id, 'E-commerce Growth Workshop', 'Faisalabad', now()->addDays(27)->setTime(15, 0), 40, 'A workshop on catalog strategy, checkout optimization, and retention campaigns.'),
-            $this->createEvent($organizerA->id, 'DevOps for Teams Masterclass', 'Islamabad', now()->addDays(42)->setTime(11, 0), 55, 'Deployment workflows, monitoring basics, and team-friendly release practices.'),
-            $this->createEvent($organizerB->id, 'AI Builders Weekend', 'Karachi', now()->addDays(60)->setTime(9, 30), 90, 'Two-day build sprint for practical AI product prototypes.'),
-            $this->createEvent($organizerA->id, 'Annual Tech Expo 2026', 'Lahore', now()->addDays(120)->setTime(10, 30), 300, 'A large showcase of local startups, developer tools, and technical talks.'),
-            $this->createEvent($organizerB->id, 'Mobile App Jam Session', 'Islamabad', now()->addDays(11)->setTime(18, 0), 35, 'Rapid mobile app ideation and prototype feedback circles.'),
-            $this->createEvent($organizerA->id, 'Alumni Tech Talk 2025', 'Karachi', now()->subDays(40)->setTime(18, 30), 100, 'A retrospective alumni event featuring talks on growth and career transitions.'),
+            $this->createEvent($adminUser->id, 'Laravel Community Summit', 'Karachi', now()->addDays(14)->setTime(18, 30), 120, 'A community-led evening on Laravel architecture, tooling, and practical scaling lessons.'),
+            $this->createEvent($adminUser->id, 'Product Design Meetup', 'Lahore', now()->addDays(9)->setTime(19, 0), 60, 'A practical meetup focused on product discovery, user journeys, and design reviews.'),
+            $this->createEvent($adminUser->id, 'Startup Pitch Night', 'Islamabad', now()->addDays(21)->setTime(17, 45), 80, 'Founders pitch their products to local mentors and early-stage operators.'),
+            $this->createEvent($adminUser->id, 'Data Engineering Bootcamp', 'Karachi', now()->addDays(35)->setTime(10, 0), 45, 'Hands-on sessions around pipelines, warehousing, and reliable data workflows.'),
+            $this->createEvent($adminUser->id, 'Women in Tech Circle', 'Lahore', now()->addDays(18)->setTime(16, 30), 50, 'Networking and speaker sessions with a focus on mentorship and career growth.'),
+            $this->createEvent($adminUser->id, 'Freelancers Networking Evening', 'Karachi', now()->addDays(5)->setTime(20, 0), 70, 'An informal networking event for freelance developers, designers, and marketers.'),
+            $this->createEvent($adminUser->id, 'E-commerce Growth Workshop', 'Faisalabad', now()->addDays(27)->setTime(15, 0), 40, 'A workshop on catalog strategy, checkout optimization, and retention campaigns.'),
+            $this->createEvent($adminUser->id, 'DevOps for Teams Masterclass', 'Islamabad', now()->addDays(42)->setTime(11, 0), 55, 'Deployment workflows, monitoring basics, and team-friendly release practices.'),
+            $this->createEvent($adminUser->id, 'AI Builders Weekend', 'Karachi', now()->addDays(60)->setTime(9, 30), 90, 'Two-day build sprint for practical AI product prototypes.'),
+            $this->createEvent($adminUser->id, 'Annual Tech Expo 2026', 'Lahore', now()->addDays(120)->setTime(10, 30), 300, 'A large showcase of local startups, developer tools, and technical talks.'),
+            $this->createEvent($adminUser->id, 'Mobile App Jam Session', 'Islamabad', now()->addDays(11)->setTime(18, 0), 35, 'Rapid mobile app ideation and prototype feedback circles.'),
+            $this->createEvent($adminUser->id, 'Alumni Tech Talk 2025', 'Karachi', now()->subDays(40)->setTime(18, 30), 100, 'A retrospective alumni event featuring talks on growth and career transitions.'),
         ]);
 
         $laravelSummit = $events->firstWhere('title', 'Laravel Community Summit');
@@ -96,7 +85,7 @@ class EventBookingDemoSeeder extends Seeder
         int $totalSeats,
         string $description
     ): Event {
-        return Event::query()->create([
+        return Event::factory()->create([
             'title' => $title,
             'description' => $description,
             'location' => $location,

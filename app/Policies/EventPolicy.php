@@ -19,16 +19,16 @@ class EventPolicy
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->isAdmin();
     }
 
     public function update(User $user, Event $event): bool
     {
-        return $event->created_by === $user->id;
+        return $user->isAdmin();
     }
 
     public function delete(User $user, Event $event): bool
     {
-        return $event->created_by === $user->id;
+        return $user->isAdmin();
     }
 }
