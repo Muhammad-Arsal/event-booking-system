@@ -35,6 +35,12 @@ class BookingService
                 ]);
             }
 
+            if ($event->event_datetime->lte(now())) {
+                throw ValidationException::withMessages([
+                    'event_id' => 'This event has already ended. Booking is closed.',
+                ]);
+            }
+
             if ($event->available_seats < $seatsBooked) {
                 throw ValidationException::withMessages([
                     'seats_booked' => 'Only '.$event->available_seats.' seat(s) are currently available.',

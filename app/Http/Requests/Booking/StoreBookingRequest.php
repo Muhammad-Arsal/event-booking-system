@@ -43,6 +43,15 @@ class StoreBookingRequest extends FormRequest
                 return;
             }
 
+            if ($event->event_datetime->lte(now())) {
+                $validator->errors()->add(
+                    'event_id',
+                    'This event has already ended. Booking is closed.'
+                );
+
+                return;
+            }
+
             $seatsRequested = (int) $this->input('seats_booked');
 
             if ($seatsRequested > $event->available_seats) {

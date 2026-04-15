@@ -55,6 +55,12 @@
                             </svg>
                         </a>
                     @else
+                        <a href="{{ route('events.index') }}"
+                           id="btn-browse-events"
+                           class="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950">
+                            Browse as Guest
+                        </a>
+
                         <a href="{{ route('login') }}"
                            id="btn-login"
                            class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950">

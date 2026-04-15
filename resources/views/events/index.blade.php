@@ -82,6 +82,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Date & Time</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Seats</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Availability</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Booking</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Action</th>
                             </tr>
                         </thead>
@@ -91,6 +92,7 @@
                                     $available = (int) $event->available_seats;
                                     $total = max((int) $event->total_seats, 1);
                                     $isLimited = $available > 0 && ($available / $total) <= 0.2;
+                                    $bookingClosed = $event->event_datetime->lte(now());
                                 @endphp
 
                                 <tr class="align-top transition hover:bg-gray-50 dark:hover:bg-gray-700/40">
@@ -104,12 +106,23 @@
                                         <span class="text-gray-400 dark:text-gray-500">/ {{ $event->total_seats }}</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm">
-                                        @if ($available < 1)
+                                        @if ($bookingClosed)
+                                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200">Closed</span>
+                                        @elseif ($available < 1)
                                             <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-200">Sold Out</span>
                                         @elseif ($isLimited)
                                             <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">Limited</span>
                                         @else
                                             <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">Available</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">
+                                        @if ($bookingClosed)
+                                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200">Closed</span>
+                                        @elseif ($available < 1)
+                                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">Sold Out</span>
+                                        @else
+                                            <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">Open</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm">
@@ -134,7 +147,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-14 text-center">
+                                    <td colspan="6" class="px-6 py-14 text-center">
                                         <p class="text-sm font-medium text-gray-700 dark:text-gray-200">No events published yet.</p>
                                         @can('create', \App\Models\Event::class)
                                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create the first event to get started.</p>

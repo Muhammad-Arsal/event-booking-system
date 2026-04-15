@@ -24,6 +24,7 @@
                 $available = (int) $event->available_seats;
                 $total = max((int) $event->total_seats, 1);
                 $isLimited = $available > 0 && ($available / $total) <= 0.2;
+                $bookingClosed = $event->event_datetime->lte(now());
             @endphp
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -56,7 +57,9 @@
                                 <div class="mt-1 flex items-center gap-2">
                                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $event->available_seats }} / {{ $event->total_seats }}</p>
 
-                                    @if ($available < 1)
+                                    @if ($bookingClosed)
+                                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200">Closed</span>
+                                    @elseif ($available < 1)
                                         <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-200">Sold Out</span>
                                     @elseif ($isLimited)
                                         <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">Limited</span>
@@ -78,7 +81,11 @@
                     <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Book This Event</h3>
 
-                        @if ($available < 1)
+                        @if ($bookingClosed)
+                            <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                This event has already ended. Booking is closed.
+                            </div>
+                        @elseif ($available < 1)
                             <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-700/60 dark:bg-amber-900/30 dark:text-amber-200">
                                 This event is currently sold out.
                             </div>

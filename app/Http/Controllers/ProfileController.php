@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Booking;
+use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -48,9 +51,36 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        DB::transaction(function () use ($user) {
+            $seatsByEvent = Booking::query()
+                ->where('user_id', $user->id)
+                ->where('status', 'booked')
+                ->selectRaw('event_id, SUM(seats_booked) as seats_to_restore')
+                ->groupBy('event_id')
+                ->get();
 
-        $user->delete();
+            foreach ($seatsByEvent as $row) {
+                $event = Event::query()
+                    ->whereKey($row->event_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $event) {
+                    continue;
+                }
+
+                $event->available_seats = min(
+                    $event->total_seats,
+                    $event->available_seats + (int) $row->seats_to_restore
+                );
+
+                $event->save();
+            }
+
+            $user->delete();
+        });
+
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
