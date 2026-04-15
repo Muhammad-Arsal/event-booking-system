@@ -121,16 +121,6 @@ Use these to test quickly:
 
 ---
 
-## How to use the system quickly
-
-1. Login as admin and create/edit/delete events.
-2. Login as reviewer and open event details.
-3. Book seats from the event details page.
-4. Open **My Bookings** to view and cancel your bookings.
-5. Check that available seats go down on booking and come back on cancel.
-
----
-
 ## Mail setup (Mailtrap)
 
 Mail is already wired to use `.env` values.
@@ -147,6 +137,16 @@ MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="noreply@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
 ```
+
+---
+
+## How to use the system quickly
+
+1. Login as admin and create/edit/delete events.
+2. Login as reviewer and open event details.
+3. Book seats from the event details page.
+4. Open **My Bookings** to view and cancel your bookings.
+5. Check that available seats go down on booking and come back on cancel.
 
 ---
 
